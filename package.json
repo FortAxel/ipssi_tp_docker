@@ -1,0 +1,20 @@
+{
+  "name": "todo-api",
+  "version": "1.0.0",
+  "description": "API REST de gestion de tâches — projet Docker / DevOps",
+  "license": "ISC",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Tests à développer en cours partie 2\" && exit 0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "mysql2": "^3.14.1",
+    "uuid": "^11.1.0"
+  }
+}
