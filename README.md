@@ -1,30 +1,41 @@
-# Todo API — UE3 Docker / DevOps
+# Todo API — IPSSI / DevOps Partie 1
 
-API REST de tâches (Node.js + MySQL), dockerisée. Projet solo, préparation CI/CD (partie 2).
+API REST de tâches (Node.js + PostgreSQL), dockerisée. Projet solo.
 
-## Lancer le projet
+## Structure du projet
 
-Prérequis : Docker et Docker Compose.
-
-```bash
-git clone <url-du-repo>
-cd projet-docker
-docker compose up --build -d
+```
+.
+├── src/
+│   ├── routes/tasks.js
+│   ├── models/task.js
+│   ├── middleware/errorHandler.js
+│   ├── logger.js
+│   ├── db.js
+│   ├── app.js
+│   └── index.js
+├── db/init.sql
+├── tests/
+├── Dockerfile
+├── docker-compose.yml
+├── package.json
+└── README.md
 ```
 
-| Service     | URL |
-|-------------|-----|
-| API         | http://localhost:3000 |
-| phpMyAdmin  | http://localhost:8081 (`root` / `root`) |
-| MySQL (hôte)| port `3307` |
+## Modèle Task
 
-```bash
-curl http://localhost:3000/health
-docker compose down      # arrêt
-docker compose down -v   # reset BDD (volume)
-```
+| Champ | Type | Obligatoire |
+|-------|------|-------------|
+| `id` | UUID | oui |
+| `title` | string | non |
+| `description` | string | non (défaut `""`) |
+| `status` | string | oui (`todo` par défaut) |
+| `createdAt` | timestamp | auto |
+| `updatedAt` | timestamp | auto |
 
 ## API
+
+Base : `http://localhost:3000`
 
 | Méthode | Route |
 |---------|-------|
@@ -35,57 +46,72 @@ docker compose down -v   # reset BDD (volume)
 | PUT | `/api/tasks/:id` |
 | DELETE | `/api/tasks/:id` |
 
-Body création : `{ "description": "...", "title": "...", "status": "todo" }` — `description` obligatoire.
-
-## Modèle Task
-
-| Champ | Type | Obligatoire | Description |
-|-------|------|-------------|-------------|
-| `id` | UUID | oui | Identifiant unique |
-| `title` | string | non | Titre |
-| `description` | string | oui | Description |
-| `status` | string | oui | État (`todo` par défaut) |
-| `createdAt` | timestamp | auto | Création |
-| `updatedAt` | timestamp | auto | Dernière modification |
-
-En base MySQL (`db/init.sql`) : colonnes `created_at` / `updated_at`, exposées en camelCase par l’API.
-
-## Base de données
-
-Schéma et table `tasks` : **`db/init.sql`**, exécuté au premier démarrage MySQL via Docker (`docker-entrypoint-initdb.d`). L’API se connecte seulement (`src/db.js`).
-
-## Structure du projet
-
-```
-.
-├── src/
-│   ├── routes/
-│   │   └── tasks.js
-│   ├── models/
-│   │   └── task.js
-│   ├── middleware/
-│   │   └── errorHandler.js
-│   ├── db.js
-│   ├── app.js
-│   └── index.js
-├── db/
-│   └── init.sql
-├── tests/
-│   ├── unit/              # partie 2
-│   └── integration/       # partie 2
-├── Dockerfile
-├── .dockerignore
-├── .gitignore
-├── .env.example
-├── docker-compose.yml
-├── package.json
-└── README.md
-```
-
-## Dev local (optionnel)
+## Lancer le projet
 
 ```bash
-npm install && npm start
+docker compose up --build -d
+curl http://localhost:3000/health
 ```
 
-Copier `.env.example` → `.env` si besoin. MySQL doit tourner et `db/init.sql` doit être appliqué.
+Identifiants PostgreSQL (compose du cours) : `todo_user` / `todo_pass`, base `todo_db`.
+
+## Test de persistance 
+
+```bash
+curl -X POST http://localhost:3000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Tâche persistante","status":"todo"}'
+
+docker compose down
+docker compose up -d
+
+curl http://localhost:3000/api/tasks
+```
+
+Les tâches doivent encore être présentes.
+
+## Test de persistance des logs (cours)
+
+Générer des entrées dans le volume `api-logs` :
+
+```bash
+curl http://localhost:3000/health
+curl -X POST http://localhost:3000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test logs","status":"todo"}'
+
+docker compose exec api cat /app/logs/access.log
+```
+
+Vérifier que les logs survivent au redémarrage :
+
+```bash
+docker compose down
+docker compose up -d
+
+docker compose exec api cat /app/logs/access.log
+# les lignes précédentes sont toujours là
+```
+
+Lire le volume depuis un **autre conteneur** (partage entre process) :
+
+```bash
+docker run --rm -v projet-docker_api-logs:/logs alpine cat /logs/access.log
+```
+
+Mission réussie si : les fichiers `app.log` / `access.log` existent après `down` puis `up` (sans `-v`).
+
+### Questions du cours
+
+- **Pourquoi `./src` n’est pas dans `volumes:` ?** C’est un bind mount (chemin hôte → conteneur), pas un volume Docker nommé.
+- **`docker compose down -v` ?** Supprime les volumes nommés : BDD et logs effacés.
+- **Comment tester la persistance des logs ?** Faire des requêtes HTTP pour remplir `access.log`, noter le contenu avec `docker compose exec api cat /app/logs/access.log`, puis `docker compose down` et `up -d` (sans `-v`) : le fichier doit être identique. On peut aussi monter `api-logs` dans un conteneur tiers (`alpine`) pour prouver que le volume est partagé et persistant.
+
+## Dev local
+
+```bash
+npm install
+npm start
+```
+
+Copier `.env.example` → `.env`. Lancer PostgreSQL avec les mêmes identifiants.
