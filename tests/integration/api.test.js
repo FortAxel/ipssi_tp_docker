@@ -1,12 +1,14 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import app from '../../src/app.js';
-import { waitForDatabase, initSchema } from '../../src/db.js';
+import { pool, waitForDatabase, initSchema } from '../../src/db.js';
+import { initLogs } from '../../src/logger.js';
 
 let server;
 let baseUrl;
 
 before(async () => {
+  initLogs();
   await waitForDatabase();
   await initSchema();
   await new Promise((resolve) => {
@@ -17,8 +19,9 @@ before(async () => {
   });
 });
 
-after(() => {
+after(async () => {
   server?.close();
+  await pool.end();
 });
 
 test('happy path — POST /api/tasks puis GET /api/tasks', async () => {

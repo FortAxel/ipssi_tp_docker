@@ -19,6 +19,7 @@ export function log(level, message, file = APP_LOG) {
 }
 
 export function logAccess(req, res, durationMs) {
+  fs.mkdirSync(LOG_DIR, { recursive: true });
   const line = `${new Date().toISOString()} ${req.method} ${req.originalUrl} ${res.statusCode} ${durationMs}ms\n`;
   fs.appendFileSync(ACCESS_LOG, line);
 }
