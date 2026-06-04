@@ -8,4 +8,12 @@ npm-debug.log
 .vscode/
 .DS_Store
 README.md
+exercice/
 tests/
+*.md
+dist/
+build/
+coverage/
+logs/
+*.log
+

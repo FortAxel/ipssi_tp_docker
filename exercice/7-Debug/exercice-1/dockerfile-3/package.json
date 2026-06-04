@@ -1,0 +1,7 @@
+{
+  "name": "debug-3",
+  "scripts": {
+    "build": "mkdir -p dist && cp server.js dist/server.js"
+  },
+  "dependencies": { "express": "^5.2.1" }
+}

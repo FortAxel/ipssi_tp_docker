@@ -1,0 +1,4 @@
+{
+  "name": "debug-2",
+  "dependencies": { "express": "^5.2.1" }
+}

@@ -1,10 +1,10 @@
-# Stage 1 — dépendances (cache layer package.json)
+# Stage 1 — installation des dépendances prod
 FROM node:18-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-# Stage 2 — production
+# Stage 2 — image finale minimale
 FROM node:18-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
