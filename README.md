@@ -140,7 +140,8 @@ sudo kubectl get pods -l app=todo-api
 curl http://127.0.0.1:31381/health
 ```
 
-Pipeline CI : `.gitlab-ci.yml` (`build-and-push` + `deploy-k3s` sur `main`).
+Pipeline CI : GitHub Actions (`.github/workflows/ci.yml`) et GitLab (`.gitlab-ci.yml`) — `test` → `build-and-push` → **`deploy-k3s`** sur `main`.
+
 
 ---
 
@@ -149,17 +150,6 @@ Pipeline CI : `.gitlab-ci.yml` (`build-and-push` + `deploy-k3s` sur `main`).
 **Stack :** API sur **K3s** ; Prometheus + Grafana : `docker compose up -d prometheus grafana`.
 
 Commandes : **[METRICS.md](./METRICS.md)** — `./scripts/traffic.sh http://127.0.0.1:31381 happy`
-
-### Tableau de métriques
-
-| Métrique | Valeur mesurée | Comment l’obtenir |
-|----------|----------------|-------------------|
-| Durée totale pipeline (lint → deploy) | _à mesurer_ | GitLab → pipeline `main` → durée totale |
-| Taille image Docker (avant optimisation) | _à mesurer_ | `docker images axfortunato/todo-api:latest` |
-| Taille image Docker (après optimisation) | Phase 6 | — |
-| Temps rolling update | _à mesurer_ | Job `deploy-k3s` ou `kubectl rollout status deployment/todo-api` |
-| Nombre de pods en charge | **2** | `kubectl get pods -l app=todo-api` |
-| Latence p95 API (Grafana) | _à mesurer_ | Dashboard **Todo API** → *Latence p95* |
 
 ### Captures
 
