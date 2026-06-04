@@ -129,7 +129,7 @@ Copier `.env.example` → `.env`. Lancer PostgreSQL avec les mêmes identifiants
 - Axel Fortunato (@FortAxel)
 
 ## Image DockerHub
-`<pseudo-dockerhub>/todo-api`
+`axfortunato/todo-api`
 
 ## Déploiement
 
