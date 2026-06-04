@@ -142,6 +142,7 @@ curl http://127.0.0.1:31381/health
 
 Pipeline CI : GitHub Actions (`.github/workflows/ci.yml`) et GitLab (`.gitlab-ci.yml`) — `test` → `build-and-push` → **`deploy-k3s`** sur `main`.
 
+Secrets GitHub : `DOCKERHUB_USER`, `DOCKERHUB_TOKEN`, `KUBE_CONFIG` (base64). Le job **`deploy-k3s`** utilise un runner **`self-hosted`** sur la machine K3s (kubeconfig → `127.0.0.1`, impossible depuis le cloud GitHub).
 
 ---
 

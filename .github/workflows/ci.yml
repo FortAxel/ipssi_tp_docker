@@ -73,7 +73,8 @@ jobs:
   deploy-k3s:
     needs: [build-and-push]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
+    # K3s est local : le kubeconfig pointe vers 127.0.0.1 → runner sur VOTRE machine (pas ubuntu-latest cloud).
+    runs-on: self-hosted
     steps:
       - uses: azure/setup-kubectl@v4
       - name: Configure kubeconfig
