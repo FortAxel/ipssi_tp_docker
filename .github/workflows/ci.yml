@@ -86,5 +86,7 @@ jobs:
         env:
           IMAGE: ${{ secrets.DOCKERHUB_USER }}/todo-api:${{ github.sha }}
         run: |
+          export KUBECONFIG="$HOME/.kube/config"
+          kubectl cluster-info
           kubectl set image deployment/todo-api todo-api="$IMAGE"
           kubectl rollout status deployment/todo-api --timeout=120s
