@@ -45,3 +45,17 @@ build-and-push:
     - docker push "$DOCKERHUB_USER/todo-api:latest"
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+
+deploy-k3s:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  needs: [build-and-push]
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+    - chmod 600 ~/.kube/config
+  script:
+    - kubectl set image deployment/todo-api todo-api="$DOCKERHUB_USER/todo-api:$CI_COMMIT_SHORT_SHA"
+    - kubectl rollout status deployment/todo-api --timeout=120s
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
