@@ -70,7 +70,7 @@ curl http://localhost:3000/api/tasks
 
 Les tâches doivent encore être présentes.
 
-## Test de persistance des logs (cours)
+## Test de persistance des logs 
 
 Générer des entrées dans le volume `api-logs` :
 
@@ -131,9 +131,66 @@ Copier `.env.example` → `.env`. Lancer PostgreSQL avec les mêmes identifiants
 ## Image DockerHub
 `axfortunato/todo-api`
 
-## Déploiement
+## Déploiement K3s (phase 4)
 
-Voir DEPLOYMENT.md
+```bash
+sudo kubectl apply -f k8s/
+./scripts/k3s-deploy-image.sh
+sudo kubectl get pods -l app=todo-api
+curl http://127.0.0.1:31381/health
+```
 
-## Dashboard Grafana
-<!-- coller le screenshot ici en phase 5 -->
+Pipeline CI : `.gitlab-ci.yml` (`build-and-push` + `deploy-k3s` sur `main`).
+
+---
+
+## Monitoring (phase 5)
+
+**Stack :** API sur **K3s** ; Prometheus + Grafana : `docker compose up -d prometheus grafana`.
+
+Commandes : **[METRICS.md](./METRICS.md)** — `./scripts/traffic.sh http://127.0.0.1:31381 happy`
+
+### Tableau de métriques
+
+| Métrique | Valeur mesurée | Comment l’obtenir |
+|----------|----------------|-------------------|
+| Durée totale pipeline (lint → deploy) | _à mesurer_ | GitLab → pipeline `main` → durée totale |
+| Taille image Docker (avant optimisation) | _à mesurer_ | `docker images axfortunato/todo-api:latest` |
+| Taille image Docker (après optimisation) | Phase 6 | — |
+| Temps rolling update | _à mesurer_ | Job `deploy-k3s` ou `kubectl rollout status deployment/todo-api` |
+| Nombre de pods en charge | **2** | `kubectl get pods -l app=todo-api` |
+| Latence p95 API (Grafana) | _à mesurer_ | Dashboard **Todo API** → *Latence p95* |
+
+### Captures
+
+Fichiers dans [`docs/captures/`](docs/captures/).
+
+#### Grafana
+
+![Grafana — dashboard Todo API](docs/captures/grafana.png)
+
+#### Prometheus
+
+![Prometheus — target todo-api-k3s UP](docs/captures/prometheus.png)
+
+#### Trafic (curl)
+
+![Terminal — génération de trafic curl](docs/captures/client.png)
+
+#### Scénario adverse — suppression d’un pod
+
+![Terminaux — delete pod et recréation](docs/captures/delete_pods.png)
+
+---
+
+## Fichiers du repo (aperçu)
+
+```
+k8s/
+monitoring/
+src/metrics.js
+scripts/traffic.sh
+scripts/k3s-deploy-image.sh
+docs/captures/
+METRICS.md
+```
