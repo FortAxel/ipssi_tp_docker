@@ -3,6 +3,16 @@ import * as taskModel from '../models/task.js';
 
 const router = express.Router();
 
+function validateCreate(body) {
+  const desc = typeof body?.description === 'string' ? body.description.trim() : '';
+  const title = typeof body?.title === 'string' ? body.title.trim() : '';
+  if (!desc && !title) {
+    const err = new Error('title ou description requis');
+    err.status = 400;
+    throw err;
+  }
+}
+
 router.get('/', async (req, res, next) => {
   try {
     const tasks = await taskModel.findAll();
@@ -26,6 +36,7 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
+    validateCreate(req.body);
     const task = await taskModel.create({
       title: req.body.title,
       description: req.body.description?.trim() ?? '',
