@@ -120,3 +120,20 @@ Copier `.env.example` → `.env`. Lancer PostgreSQL avec les mêmes identifiants
 
 <img width="2227" height="562" alt="Capture d’écran du 2026-06-03 16-52-05" src="https://github.com/user-attachments/assets/21fe33dd-39fd-423a-a7a6-6230a8ce281b" />
 <img width="1784" height="800" alt="Capture d’écran du 2026-06-03 16-45-04" src="https://github.com/user-attachments/assets/88133956-505f-4ed1-a8aa-2da9e18a5076" />
+
+# Todo API - Pipeline CI/CD (projet groupe)
+
+## Membres
+- Ayman Mougou (@Tintin200)
+- Killian Octau (@KillianOCTAU)
+- Axel Fortunato (@FortAxel)
+
+## Image DockerHub
+`<pseudo-dockerhub>/todo-api`
+
+## Déploiement
+
+Voir DEPLOYMENT.md
+
+## Dashboard Grafana
+<!-- coller le screenshot ici en phase 5 -->
