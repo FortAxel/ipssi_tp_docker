@@ -1,0 +1,12 @@
+# Configuration du SERVEUR Prometheus (pas Kubernetes).
+# Prometheus lit ce fichier et appelle GET /metrics sur chaque "target".
+
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  # API sur K3s (NodePort — port : kubectl get svc todo-api)
+  - job_name: todo-api-k3s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['host.docker.internal:31381']

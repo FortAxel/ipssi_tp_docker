@@ -11,10 +11,15 @@ spec:
     metadata:
       labels:
         app: todo-api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: todo-api
           image: axfortunato/todo-api:latest
+         imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
           env:
