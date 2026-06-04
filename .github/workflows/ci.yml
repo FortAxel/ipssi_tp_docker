@@ -69,3 +69,21 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USER }}/todo-api:latest
             ${{ secrets.DOCKERHUB_USER }}/todo-api:${{ github.sha }}
+
+  deploy-k3s:
+    needs: [build-and-push]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: azure/setup-kubectl@v4
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+      - name: Rolling update on K3s
+        env:
+          IMAGE: ${{ secrets.DOCKERHUB_USER }}/todo-api:${{ github.sha }}
+        run: |
+          kubectl set image deployment/todo-api todo-api="$IMAGE"
+          kubectl rollout status deployment/todo-api --timeout=120s
