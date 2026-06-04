@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "test": "echo \"Tests à développer en cours partie 2\" && exit 0"
+    "test": "node --test tests/unit/*.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
