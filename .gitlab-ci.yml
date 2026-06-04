@@ -1,0 +1,11 @@
+stages:
+  - test
+  - build
+  - deploy
+
+test-unit:
+  image: node:18-alpine
+  stage: test
+  script:
+    - npm ci
+    - npm test
